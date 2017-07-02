@@ -35,6 +35,11 @@ class Book(object):
         return self._book.get_sheet_by_name(key)
 
     @property
+    def active(self):
+        """Return the active sheet."""
+        return self._book.active
+
+    @property
     def sheet_names(self):
         """Return sheet names."""
         return self._sheet_names
