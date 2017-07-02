@@ -8,7 +8,10 @@ Simple wrapper for openpyxl::
 >>> book = Book('filename.xlsx')
 >>> book
 <Book:   /home/jugurtha/filename.xlsx>
-<Sheets: COOL Sheet 1 | Accounting | Home renovations>
+<Sheets: Cool Sheet 1 | Accounting | Home renovations>
+
+>>> book.active
+<Worksheet "Cool Sheet 1">
 
 >>> book['Home renovations']
 <Worksheet "Home renovations">
@@ -46,7 +49,7 @@ class Book(object):
 
     @property
     def sheets(self):
-        """Return actual sheets."""
+        """Return actual sheet objects."""
         return self._sheets
 
     def __repr__(self):

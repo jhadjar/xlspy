@@ -12,7 +12,10 @@ xlspy will use openpyxl to do this:
 >>> book = Book('filename.xlsx')
 >>> book
 <Book:   /home/jugurtha/filename.xlsx>
-<Sheets: COOL Sheet 1 | Accounting | Home renovations>
+<Sheets: Cool Sheet 1 | Accounting | Home renovations>
+
+>>> book.active
+<Worksheet "Cool Sheet 1">
 
 >>> book['Home renovations']
 <Worksheet "Home renovations">
