@@ -3,7 +3,6 @@ XLSPy.
 
 Simple wrapper for openpyxl::
 
-
 >>> from xlspy import Book
 >>> book = Book('filename.xlsx')
 >>> book
@@ -11,13 +10,64 @@ Simple wrapper for openpyxl::
 <Sheets: Cool Sheet 1 | Accounting | Home renovations>
 
 >>> book.active
-<Worksheet "Cool Sheet 1">
+<Sheet "Cool Sheet 1">
 
->>> book['Home renovations']
-<Worksheet "Home renovations">
+# Get a sheet directly:
+
+>>> home = book['Home renovations']
+>>> home
+<Sheet "Home renovations">
+
+>>> column_a = home['A']
 """
 
+from itertools import chain
+
 import openpyxl
+
+
+class Sheet(object):
+    """Wrapper for openpyxl sheets.
+
+    Basic usage of a Sheet instance:
+
+        >>> s['F']
+        # Result: list of cells of column 'F'
+
+        >>> s['F1:F4']
+        # Result: tuple of one element tuples (openpyxl)
+    """
+
+    # I wonder if I'm going to change the standard way openpyxl returns
+    # a cell range (tuple of tuples) as I did with the whole column.
+    def __init__(self, sheet):
+        """Initialize the sheet."""
+        self._sheet = sheet
+
+    def __getitem__(self, key):
+        """Make access to "columns" easier. Cell access remains the same."""
+        if ':' not in key:
+            # Use wants to access a column, example: Sheet['F'].
+            # We return Fmin_row:Fmax_row cells under the hood.
+            return list(chain.from_iterable(
+                self._sheet['{key}{min_row}:{key}{max_row}'.format(
+                    key=key,
+                    min_row=self._sheet.min_row,
+                    max_row=self._sheet.max_row)
+                ])
+            )
+
+        else:
+            # User wants to access specific cells Sheet['F1:F3']
+            return self._sheet[key]
+
+    def __getattr__(self, name):
+        """Return the original openpyxl arguments for whatever is not ours."""
+        return getattr(self._sheet, name)
+
+    def __repr__(self):
+        """Nice representation."""
+        return "<Sheet: '{}'".format(self._sheet.title)
 
 
 class Book(object):
@@ -40,7 +90,7 @@ class Book(object):
     @property
     def active(self):
         """Return the active sheet."""
-        return self._book.active
+        return Sheet(self._book.active)
 
     @property
     def sheet_names(self):
@@ -50,7 +100,11 @@ class Book(object):
     @property
     def sheets(self):
         """Return actual sheet objects."""
-        return self._sheets
+        return [Sheet(sheet) for sheet in self._sheets]
+
+    def __getattr__(self, name):
+        """Return original openpyxl Workbook attributes."""
+        return getattr(self._book, name)
 
     def __repr__(self):
         """Nice repr."""
@@ -59,10 +113,3 @@ class Book(object):
                   self._filename,
                   " | ".join(["{}".format(name) for name in self.sheet_names]))
         return msg
-
-
-class Sheet(object):
-    """Wrapper for openpyxl sheets."""
-
-    def __init__(self, sheet):
-        """Initialize the sheet."""
