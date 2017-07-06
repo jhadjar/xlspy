@@ -67,7 +67,7 @@ class Sheet(object):
 
     def __repr__(self):
         """Nice representation."""
-        return "<Sheet: '{}'".format(self._sheet.title)
+        return "<{}: '{}'".format(self.__class__.__name__, self._sheet.title)
 
 
 class Book(object):
@@ -108,8 +108,9 @@ class Book(object):
 
     def __repr__(self):
         """Nice repr."""
-        msg = "<Book:\t{}>\n" \
+        msg = "<{}:\t{}>\n" \
               "<Sheets:\t{}>".format(
+                  self.__class__.__name__,
                   self._filename,
                   " | ".join(["{}".format(name) for name in self.sheet_names]))
         return msg
