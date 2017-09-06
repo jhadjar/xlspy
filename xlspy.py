@@ -67,7 +67,7 @@ class Sheet(object):
 
     def __repr__(self):
         """Nice representation."""
-        return "<{}: '{}'".format(self.__class__.__name__, self._sheet.title)
+        return "<{}: '{}'>".format(self.__class__.__name__, self._sheet.title)
 
 
 class Book(object):
